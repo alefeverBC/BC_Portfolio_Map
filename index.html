@@ -100,13 +100,11 @@ function getStyle(props) {
 }
 function styleFeature(feature) { return getStyle(feature.properties); }
 var map = L.map('map', {center:[37.5,-90], zoom:5, zoomControl:true});
-L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {attribution:'&copy; OpenStreetMap &copy; CARTO',subdomains:'abcd',maxZoom:19}).addTo(map);
+L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}', {attribution:'&copy; Esri &mdash; Esri, DeLorme, NAVTEQ',maxZoom:16}).addTo(map);
 fetch('https://cdn.jsdelivr.net/npm/us-atlas@3/counties-10m.json')
   .then(function(r){if(!r.ok)throw new Error();return r.json();})
   .then(function(topo){
     var countiesGeo=topojson.feature(topo,topo.objects.counties);
-    L.geoJSON(countiesGeo,{style:{color:'#374151',weight:1.6,opacity:0.65,fillOpacity:0},interactive:false}).addTo(map);
-    L.geoJSON(topojson.feature(topo,topo.objects.states),{style:{color:'#111827',weight:2.5,opacity:0.7,fillOpacity:0},interactive:false}).addTo(map);
     var labelLayer=L.layerGroup().addTo(map);
     function polygonCentroid(ring){var area=0,cx=0,cy=0,n=ring.length;for(var i=0,j=n-1;i<n;j=i++){var xi=ring[i][0],yi=ring[i][1],xj=ring[j][0],yj=ring[j][1],a=xi*yj-xj*yi;area+=a;cx+=(xi+xj)*a;cy+=(yi+yj)*a;}area/=2;if(Math.abs(area)<1e-12){var x0=Infinity,x1=-Infinity,y0=Infinity,y1=-Infinity;ring.forEach(function(c){x0=Math.min(x0,c[0]);x1=Math.max(x1,c[0]);y0=Math.min(y0,c[1]);y1=Math.max(y1,c[1]);});return[(x0+x1)/2,(y0+y1)/2];}return[cx/(6*area),cy/(6*area)];}
     function featureCentroid(f){var g=f.geometry;if(g.type==='Polygon')return polygonCentroid(g.coordinates[0]);if(g.type==='MultiPolygon'){var bA=-Infinity,bR=null;g.coordinates.forEach(function(p){var r=p[0],a=0,n=r.length;for(var i=0,j=n-1;i<n;j=i++)a+=(r[j][0]+r[i][0])*(r[j][1]-r[i][1]);a=Math.abs(a)/2;if(a>bA){bA=a;bR=r;}});return polygonCentroid(bR);}return null;}
@@ -156,6 +154,13 @@ function onEachFeature(feature,layer){
 }
 geoLayer=L.geoJSON(geojsonData,{style:styleFeature,onEachFeature:onEachFeature}).addTo(map);
 map.fitBounds(geoLayer.getBounds(),{padding:[30,30]});
+// County and state boundaries from us-atlas
+fetch('https://cdn.jsdelivr.net/npm/us-atlas@3/counties-10m.json')
+  .then(function(r){if(!r.ok)throw new Error();return r.json();})
+  .then(function(topo){
+    L.geoJSON(topojson.feature(topo,topo.objects.counties),{style:{color:'#374151',weight:1.6,opacity:0.65,fillOpacity:0},interactive:false}).addTo(map);
+    L.geoJSON(topojson.feature(topo,topo.objects.states),{style:{color:'#111827',weight:2.5,opacity:0.7,fillOpacity:0},interactive:false}).addTo(map);
+  }).catch(function(){});
 function applyFilter(){
   var visible=0;
   geoLayer.eachLayer(function(layer){
