@@ -128,7 +128,7 @@ function buildPopupHTML(features,idx){
     +'<table style="width:100%;font-size:0.8rem;border-collapse:collapse;color:#1a1a2e">'
     +'<tr><td style="color:#6b7280;padding:3px 0;width:45%">Asset</td><td style="font-weight:bold;font-size:0.75rem">'+(p.Asset||'—')+'</td></tr>'
     +'<tr><td style="color:#6b7280;padding:3px 0">Interest Type</td><td>'+(p.interest_t||'—')+'</td></tr>'
-    +'<tr><td style="color:#6b7280;padding:3px 0">Lease Status</td><td>'+(p.Lease_Stat||'—')+'</td></tr>'
+    +(p.L_UL==='UL'?'<tr><td style="color:#6b7280;padding:3px 0">Leased/Unleased</td><td style="color:#dc2626;font-weight:bold">Unleased</td></tr>':'<tr><td style="color:#6b7280;padding:3px 0">Leased/Unleased</td><td>Leased</td></tr>')
     +(l==='cop7_wi'?'<tr><td style="color:#6b7280;padding:3px 0">NMA</td><td>'+nmaStr+'</td></tr>':p.interest_t==='OR'?'<tr><td style="color:#6b7280;padding:3px 0">NRA</td><td>'+nraStr+'</td></tr>':'<tr><td style="color:#6b7280;padding:3px 0">NMA</td><td>'+nmaStr+'</td></tr><tr><td style="color:#6b7280;padding:3px 0">NRA</td><td>'+nraStr+'</td></tr>')
     +'</table>'+nav+'</div>';
 }
